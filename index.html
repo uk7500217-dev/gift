@@ -1,0 +1,187 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>The Floral Atelier</title>
+    <style>
+        :root { --red: #4a0000; --yellow: #f4d03f; --white: #ffffff; }
+        body, html { margin: 0; padding: 0; font-family: 'Cinzel', serif; scroll-behavior: smooth; overflow-x: hidden; background: var(--white); transition: background 1s ease; }
+
+        /* --- STAGE 1: SCROLL STORY --- */
+        .section { height: 100vh; display: flex; flex-direction: column; align-items: center; justify-content: center; text-align: center; padding: 20px; transition: 1s; }
+        .scroll-hint { position: fixed; bottom: 20px; width: 100%; text-align: center; font-size: 0.8rem; letter-spacing: 3px; color: #888; animation: bounce 2s infinite; z-index: 50; }
+        
+        #enter-btn { display: none; margin-top: 30px; padding: 15px 40px; border: 1px solid white; background: none; color: white; cursor: pointer; letter-spacing: 5px; font-size: 1.2rem; transition: 0.5s; }
+        #enter-btn:hover { background: white; color: black; }
+
+        /* --- STAGE 2: SELECTION HUB --- */
+        #hub { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: radial-gradient(circle, #1a0000 0%, #000 100%); z-index: 100; flex-direction: column; align-items: center; justify-content: center; color: white; }
+        .bouquet-grid { display: flex; gap: 40px; margin-top: 50px; }
+        .b-card { width: 200px; cursor: pointer; transition: 0.4s; text-align: center; }
+        .b-card img { width: 100%; filter: drop-shadow(0 0 10px rgba(255,255,255,0.1)); transition: 0.4s; }
+        .b-card:hover img { transform: translateY(-20px) scale(1.1); filter: drop-shadow(0 0 30px var(--red)); }
+
+        /* --- STAGE 3: THE WORKSHOP --- */
+        #workshop { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: #0a0a0a; z-index: 200; overflow: hidden; }
+        .workspace { position: relative; width: 100%; height: 100%; display: flex; }
+        .shelf { width: 250px; background: #111; padding: 20px; display: flex; flex-direction: column; gap: 20px; overflow-y: auto; border-right: 1px solid #333; z-index: 201; }
+        .shelf p { color: #555; font-size: 0.7rem; letter-spacing: 2px; border-bottom: 1px solid #222; padding-bottom: 5px; }
+        .part { width: 100px; cursor: grab; filter: drop-shadow(0 5px 5px black); transition: 0.2s; }
+        .part:active { cursor: grabbing; }
+
+        /* Assembly Table */
+        .table { flex-grow: 1; position: relative; background: url('https://www.transparenttextures.com/patterns/dark-wood.png'), #1a0f0a; display: flex; align-items: center; justify-content: center; }
+        .drop-zone { width: 600px; height: 800px; position: relative; border: 1px solid rgba(255,255,255,0.05); }
+        .placed { position: absolute; cursor: move; transform-origin: center; transition: outline 0.2s; }
+
+        /* --- FINALE & LETTER --- */
+        #finale-overlay { display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.85); z-index: 500; align-items: center; justify-content: center; flex-direction: column; }
+        #letter-box { display: none; background: #fffdf5; color: #333; padding: 40px; border-radius: 2px; box-shadow: 0 0 40px rgba(255,46,46,0.3); max-width: 400px; font-family: 'Georgia', serif; text-align: center; position: relative; }
+        .envelope { font-size: 80px; cursor: pointer; transition: 0.5s; filter: drop-shadow(0 0 20px rgba(255,255,255,0.2)); }
+        .bloom-petal { position: fixed; color: #ffcccc; pointer-events: none; z-index: 600; font-size: 20px; }
+
+        .btn-group { position: fixed; bottom: 20px; right: 20px; display: flex; gap: 10px; z-index: 300; }
+        button.tool { background: #111; border: 1px solid #444; color: #888; padding: 10px 20px; cursor: pointer; letter-spacing: 2px; }
+        button.tool:hover { border-color: white; color: white; }
+
+        @keyframes bounce { 0%, 100% { transform: translateY(0); } 50% { transform: translateY(-10px); } }
+    </style>
+</head>
+<body>
+
+    <div class="scroll-hint" id="hint">SCROLL TO BEGIN</div>
+
+    <div class="section" id="sec1"><h1>PURITY</h1></div>
+    <div class="section" id="sec2"><h1>RADIANCE</h1></div>
+    <div class="section" id="sec3">
+        <h1 style="color: white;">PASSION</h1>
+        <button id="enter-btn" onclick="openHub()">Enter The Atelier</button>
+    </div>
+
+    <div id="hub">
+        <h2>SELECT A SOUL</h2>
+        <div class="bouquet-grid">
+            <div class="b-card" onclick="openWorkshop()"><img src="sun.png"><p>SUNFLOWER</p></div>
+            <div class="b-card" onclick="openWorkshop()"><img src="rose.png"><p>RED ROSE</p></div>
+            <div class="b-card" onclick="openWorkshop()"><img src="flowers1.png"><p>BLACK ROSE</p></div>
+            <div class="b-card" onclick="openWorkshop()"><img src="flora1.png"><p>THE MIXTURE</p></div>
+        </div>
+    </div>
+
+    <div id="workshop">
+        <div class="workspace">
+            <div class="shelf">
+                <p>FLOWERS</p>
+                <img src="black.png" class="part" draggable="true" id="f1">
+                <img src="sunny.png" class="part" draggable="true" id="f2">
+                <img src="roseee.png" class="part" draggable="true" id="f3">
+                <p>WRAPS & BOWS</p>
+                <div style="width: 100px; height: 140px; background: #c4a484; border: 1px solid #a38568; box-shadow: inset 0 0 10px rgba(0,0,0,0.2);" class="part" draggable="true" id="wrap_paper"></div>
+                <div style="font-size: 50px;" class="part" draggable="true" id="bow">🎀</div>
+                <div style="font-size: 50px;" class="part" draggable="true" id="heart">❤️</div>
+            </div>
+            <div class="table">
+                <div class="drop-zone" id="assembly-area">
+                    <p style="position: absolute; width: 100%; text-align: center; top: 45%; color: rgba(255,255,255,0.05); letter-spacing: 5px;">DRAG ITEMS HERE</p>
+                </div>
+            </div>
+        </div>
+        
+        <div class="btn-group">
+            <button class="tool" onclick="location.reload()">RESTART</button>
+            <button class="tool" style="border-color: #ff2e2e; color: #ff2e2e;" onclick="triggerFinale()">GIVE GIFT ❤️</button>
+        </div>
+    </div>
+
+    <div id="finale-overlay">
+        <div class="envelope" id="env" onclick="revealLetter()">📩</div>
+        <div id="letter-box">
+            <h2 style="color: #8b0000; margin-top:0;">For You</h2>
+            <p>You made this beautiful, just like you make everything else better. Thank you for being in my world.</p>
+            <button class="tool" onclick="location.reload()" style="background:white; color: black; border-color: black;">Close with Love</button>
+        </div>
+    </div>
+
+    <script>
+        let zCounter = 10;
+
+        // Scroll Logic
+        window.addEventListener('scroll', () => {
+            const scroll = window.scrollY;
+            const btn = document.getElementById('enter-btn');
+            const hint = document.getElementById('hint');
+            if (scroll < 500) { document.body.style.background = "#ffffff"; hint.style.opacity = "1"; }
+            else if (scroll < 1200) { document.body.style.background = "#f4d03f"; hint.style.color = "#8a6d3b"; }
+            else { document.body.style.background = "#2a0000"; btn.style.display = "block"; hint.style.opacity = "0"; }
+        });
+
+        function openHub() { document.getElementById('hub').style.display = 'flex'; }
+        function openWorkshop() { document.getElementById('workshop').style.display = 'block'; }
+
+        // Drag and Drop
+        document.querySelectorAll('.part').forEach(p => {
+            p.addEventListener('dragstart', (e) => e.dataTransfer.setData('text', e.target.id));
+        });
+
+        const assembly = document.getElementById('assembly-area');
+        assembly.addEventListener('dragover', (e) => e.preventDefault());
+
+        assembly.addEventListener('drop', (e) => {
+            e.preventDefault();
+            const id = e.dataTransfer.getData('text');
+            const original = document.getElementById(id);
+            const clone = original.cloneNode(true);
+            
+            clone.classList.add('placed');
+            clone.classList.remove('part');
+            
+            const rect = assembly.getBoundingClientRect();
+            clone.style.left = (e.clientX - rect.left - 50) + 'px';
+            clone.style.top = (e.clientY - rect.top - 70) + 'px';
+
+            // AUTO-LAYERING Logic
+            if(id === 'wrap_paper') {
+                clone.style.zIndex = 1; 
+                clone.style.width = "400px";
+                clone.style.height = "550px";
+            } else if(id === 'bow' || id === 'heart') {
+                clone.style.zIndex = 100;
+                clone.style.width = "auto";
+            } else {
+                clone.style.zIndex = 50;
+                clone.style.width = "220px";
+            }
+
+            // Move and Rotate
+            clone.addEventListener('mousedown', () => { clone.style.zIndex = ++zCounter; });
+            let rot = 0;
+            clone.addEventListener('dblclick', () => { rot += 15; clone.style.transform = `rotate(${rot}deg)`; });
+
+            assembly.appendChild(clone);
+        });
+
+        function triggerFinale() {
+            document.getElementById('finale-overlay').style.display = 'flex';
+            setInterval(createPetal, 300);
+        }
+
+        function createPetal() {
+            const p = document.createElement('div');
+            p.innerHTML = '🌸';
+            p.className = 'bloom-petal';
+            p.style.left = Math.random() * 100 + 'vw';
+            p.style.top = '-20px';
+            p.style.transition = `top ${Math.random()*3 + 2}s linear, left 2s ease-in-out`;
+            document.body.appendChild(p);
+            setTimeout(() => { p.style.top = '110vh'; p.style.left = (parseFloat(p.style.left) + (Math.random()*10 - 5)) + 'vw'; }, 10);
+            setTimeout(() => p.remove(), 5000);
+        }
+
+        function revealLetter() {
+            document.getElementById('env').style.display = 'none';
+            document.getElementById('letter-box').style.display = 'block';
+        }
+    </script>
+</body>
+</html>
