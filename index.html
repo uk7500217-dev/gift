@@ -1,21 +1,351 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <title>The Floral Atelier</title>
     <style>
-        :root { --red: #4a0000; --yellow: #f4d03f; --white: #ffffff; }
+        :root {
+            --red: #4a0000;
+            --yellow: #c9d650;
+            --white: #ebde69;
+        }
+
+        body,
+        html {
+            margin: 0;
+            padding: 0;
+            font-family: 'Cinzel', serif;
+            scroll-behavior: smooth;
+            overflow-x: hidden;
+            background: var(--white);
+            transition: background 1s ease;
+        }
+
+        /* Make images responsive */
+        img {
+            max-width: 100%;
+            height: auto;
+        }
+
+        /* --- STAGE 1 --- */
+
+        .section {
+            height: 100vh;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            text-align: center;
+            padding: 20px;
+            transition: 1s;
+        }
+
+        .section h1 {
+            font-size: clamp(2rem, 5vw, 4rem);
+        }
+
+        .scroll-hint {
+            position: fixed;
+            bottom: 20px;
+            width: 100%;
+            text-align: center;
+            font-size: .8rem;
+            letter-spacing: 3px;
+            color: #888;
+            animation: bounce 2s infinite;
+            z-index: 50;
+        }
+
+        #enter-btn {
+            display: none;
+            margin-top: 30px;
+            padding: 12px 30px;
+            border: 1px solid white;
+            background: none;
+            color: white;
+            cursor: pointer;
+            letter-spacing: 5px;
+            font-size: clamp(14px, 2vw, 18px);
+            transition: .5s;
+        }
+
+        #enter-btn:hover {
+            background: white;
+            color: black;
+        }
+
+        /* --- HUB --- */
+
+        #hub {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: radial-gradient(circle, #1a0000 0%, #000 100%);
+            z-index: 100;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            padding: 20px;
+        }
+
+        .bouquet-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(120px, 1fr));
+            gap: 20px;
+            width: 90%;
+            max-width: 800px;
+            margin-top: 40px;
+        }
+
+        .b-card {
+            cursor: pointer;
+            transition: .4s;
+            text-align: center;
+        }
+
+        .b-card img {
+            width: 100%;
+            filter: drop-shadow(0 0 10px rgba(255, 255, 255, .1));
+            transition: .4s;
+        }
+
+        .b-card:hover img {
+            transform: translateY(-15px) scale(1.08);
+            filter: drop-shadow(0 0 25px var(--red));
+        }
+
+        /* --- WORKSHOP --- */
+
+        #workshop {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: #0a0a0a;
+            z-index: 200;
+            overflow: hidden;
+        }
+
+        .workspace {
+            position: relative;
+            width: 100%;
+            height: 100%;
+            display: flex;
+        }
+
+        /* Shelf */
+
+        .shelf {
+            width: 20vw;
+            min-width: 120px;
+            max-width: 200px;
+            background: #111;
+            padding: 15px;
+            display: flex;
+            flex-direction: column;
+            gap: 15px;
+            overflow-y: auto;
+            border-right: 1px solid #333;
+            z-index: 201;
+        }
+
+        .shelf p {
+            color: #555;
+            font-size: .7rem;
+            letter-spacing: 2px;
+            border-bottom: 1px solid #222;
+            padding-bottom: 5px;
+        }
+
+        .part {
+            width: 20vw;
+            max-width: 100px;
+            cursor: grab;
+            filter: drop-shadow(0 5px 5px black);
+            transition: .2s;
+        }
+
+        .part:active {
+            cursor: grabbing;
+        }
+
+        /* Table */
+
+        .table {
+            flex-grow: 1;
+            position: relative;
+            background: url('https://www.transparenttextures.com/patterns/dark-wood.png'), #1a0f0a;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 10px;
+        }
+
+        /* Drop Zone */
+
+        .drop-zone {
+            width: 90vw;
+            max-width: 600px;
+            height: 75vh;
+            max-height: 800px;
+            position: relative;
+            border: 1px solid rgba(255, 255, 255, .05);
+        }
+
+        .placed {
+            position: absolute;
+            cursor: move;
+            transform-origin: center;
+            transition: outline .2s;
+        }
+
+        /* --- FINALE --- */
+
+        #finale-overlay {
+            display: none;
+            position: fixed;
+            inset: 0;
+            background: rgba(0, 0, 0, .85);
+            z-index: 500;
+            align-items: center;
+            justify-content: center;
+            flex-direction: column;
+        }
+
+        #letter-box {
+            display: none;
+            background: #fffdf5;
+            color: #333;
+            padding: 30px;
+            border-radius: 4px;
+            box-shadow: 0 0 40px rgba(255, 46, 46, .3);
+            max-width: 90%;
+            width: 400px;
+            font-family: 'Georgia', serif;
+            text-align: center;
+        }
+
+        .envelope {
+            font-size: clamp(60px, 8vw, 80px);
+            cursor: pointer;
+            transition: .5s;
+            filter: drop-shadow(0 0 20px rgba(255, 255, 255, .2));
+        }
+
+        .bloom-petal {
+            position: fixed;
+            color: #ffcccc;
+            pointer-events: none;
+            z-index: 600;
+            font-size: 20px;
+        }
+
+        /* Buttons */
+
+        .btn-group {
+            position: fixed;
+            bottom: 20px;
+            right: 20px;
+            display: flex;
+            gap: 10px;
+            z-index: 300;
+        }
+
+        button.tool {
+            background: #111;
+            border: 1px solid #444;
+            color: #888;
+            padding: 10px 18px;
+            cursor: pointer;
+            letter-spacing: 2px;
+            font-size: 14px;
+        }
+
+        button.tool:hover {
+            border-color: white;
+            color: white;
+        }
+
+        /* --- MOBILE --- */
+
+        @media (max-width:768px) {
+
+            .workspace {
+                flex-direction: column;
+            }
+
+            .shelf {
+                width: 100%;
+                flex-direction: row;
+                overflow-x: auto;
+                overflow-y: hidden;
+                border-right: none;
+                border-bottom: 1px solid #333;
+            }
+
+            .shelf p {
+                display: none;
+            }
+
+            .part {
+                width: 70px;
+                max-width: none;
+            }
+
+            .table {
+                height: 80vh;
+            }
+
+            .drop-zone {
+                width: 95vw;
+                height: 70vh;
+            }
+
+            .b-card {
+                width: 120px;
+                margin: auto;
+            }
+
+            .btn-group {
+                right: 10px;
+                bottom: 10px;
+            }
+
+        }
+
+        /* animation */
+
+        @keyframes bounce {
+
+            0%,
+            100% {
+                transform: translateY(0)
+            }
+
+            50% {
+                transform: translateY(-10px)
+            }
+        }
+
+        /* :root { --red: #4a0000; --yellow: #f4d03f; --white: #ffffff; }
         body, html { margin: 0; padding: 0; font-family: 'Cinzel', serif; background: var(--white); overflow-x: hidden; width: 100%; height: 100%; }
 
         /* --- STAGE 1: SCROLL STORY --- */
-        .section { height: 100vh; display: flex; flex-direction: column; align-items: center; justify-content: center; text-align: center; padding: 20px; transition: 1s; }
+        /* .section { height: 100vh; display: flex; flex-direction: column; align-items: center; justify-content: center; text-align: center; padding: 20px; transition: 1s; }
         .scroll-hint { position: fixed; bottom: 20px; width: 100%; text-align: center; font-size: 0.7rem; letter-spacing: 3px; color: #888; animation: bounce 2s infinite; z-index: 50; }
         
-        #enter-btn { display: none; margin-top: 30px; padding: 12px 30px; border: 1px solid white; background: none; color: white; cursor: pointer; letter-spacing: 3px; font-size: 1rem; transition: 0.5s; }
+        #enter-btn { display: none; margin-top: 30px; padding: 12px 30px; border: 1px solid white; background: none; color: white; cursor: pointer; letter-spacing: 3px; font-size: 1rem; transition: 0.5s; } */
 
         /* --- STAGE 2: SELECTION HUB --- */
-        #hub { display: none; position: fixed; inset: 0; background: radial-gradient(circle, #1a0000 0%, #000 100%); z-index: 100; flex-direction: column; align-items: center; justify-content: center; color: white; padding: 20px; }
+        /* #hub { display: none; position: fixed; inset: 0; background: radial-gradient(circle, #1a0000 0%, #000 100%); z-index: 100; flex-direction: column; align-items: center; justify-content: center; color: white; padding: 20px; }
         .bouquet-grid { 
             display: grid; 
             grid-template-columns: repeat(2, 1fr); 
@@ -25,26 +355,16 @@
             margin-top: 30px; 
         }
         .b-card { cursor: pointer; transition: 0.4s; text-align: center; }
-        .b-card img { width: 80%; max-width: 150px; filter: drop-shadow(0 0 10px rgba(255,255,255,0.1)); }
+        .b-card img { width: 80%; max-width: 150px; filter: drop-shadow(0 0 10px rgba(255,255,255,0.1)); } */
 
         /* --- STAGE 3: RESPONSIVE WORKSHOP --- */
-        #workshop { display: none; position: fixed; inset: 0; background: #0a0a0a; z-index: 200; }
-        .workspace { display: flex; flex-direction: row; width: 100%; height: 100%; }
+        /* #workshop { display: none; position: fixed; inset: 0; background: #0a0a0a; z-index: 200; }
+        .workspace { display: flex; flex-direction: row; width: 100%; height: 100%; } */
 
         /* Mobile Sidebar becomes a Bottom Dock */
-        .shelf { 
-            width: 120px; background: #111; padding: 15px; 
-            display: flex; flex-direction: column; gap: 15px; 
-            overflow-y: auto; border-right: 1px solid #333; 
-        }
-        .part { width: 80%; margin: 0 auto; cursor: grab; filter: drop-shadow(0 5px 5px black); }
-
-        .table { flex-grow: 1; position: relative; background: #1a0f0a; overflow: hidden; }
-        .drop-zone { width: 100%; height: 100%; position: relative; }
-        .placed { position: absolute; cursor: move; transform-origin: center; touch-action: none; }
 
         /* --- MOBILE ADAPTATION (Phones/Tabs) --- */
-        @media (max-width: 768px) {
+        /* @media (max-width: 768px) {
             .workspace { flex-direction: column-reverse; }
             .shelf { 
                 width: 100%; height: 100px; 
@@ -54,10 +374,10 @@
             .part { width: 60px; height: 60px; }
             .section h1 { font-size: 1.5rem; }
             #letter-box { width: 85%; padding: 20px; }
-        }
+        } */
 
         /* --- FINALE --- */
-        #finale-overlay { display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.9); z-index: 500; align-items: center; justify-content: center; }
+        /* #finale-overlay { display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.9); z-index: 500; align-items: center; justify-content: center; }
         #letter-box { display: none; background: #fffdf5; color: #333; padding: 30px; border-radius: 5px; max-width: 90%; font-family: serif; text-align: center; }
         .envelope { font-size: 60px; cursor: pointer; }
         .bloom-petal { position: fixed; pointer-events: none; z-index: 600; }
@@ -66,14 +386,19 @@
         button.tool { background: rgba(0,0,0,0.6); border: 1px solid #444; color: #fff; padding: 8px 12px; font-size: 0.7rem; cursor: pointer; }
 
         @keyframes bounce { 0%, 100% { transform: translateY(0); } 50% { transform: translateY(-10px); } }
-    </style>
+    </style> */
 </head>
+
 <body>
 
     <div class="scroll-hint" id="hint">SCROLL</div>
 
-    <div class="section" id="sec1"><h1>ONLY</h1></div>
-    <div class="section" id="sec2"><h1>FOR</h1></div>
+    <div class="section" id="sec1">
+        <h1>ONLY</h1>
+    </div>
+    <div class="section" id="sec2">
+        <h1>FOR</h1>
+    </div>
     <div class="section" id="sec3">
         <h1 style="color: var(--red);">YOU🤍</h1>
         <button id="enter-btn" onclick="openHub()">START</button>
@@ -82,10 +407,18 @@
     <div id="hub">
         <h2 style="font-size: 1rem; letter-spacing: 3px;">CHOOSE A SOUL</h2>
         <div class="bouquet-grid">
-            <div class="b-card" onclick="openWorkshop()"><img src="sun.png"><p style="font-size:0.6rem">SUNFLOWER</p></div>
-            <div class="b-card" onclick="openWorkshop()"><img src="rose.png"><p style="font-size:0.6rem">RED ROSE</p></div>
-            <div class="b-card" onclick="openWorkshop()"><img src="flowers1.png"><p style="font-size:0.6rem">BLACK ROSE</p></div>
-            <div class="b-card" onclick="openWorkshop()"><img src="flora1.png"><p style="font-size:0.6rem">MIXTURE</p></div>
+            <div class="b-card" onclick="openWorkshop()"><img src="sun.png">
+                <p style="font-size:0.6rem">SUNFLOWER</p>
+            </div>
+            <div class="b-card" onclick="openWorkshop()"><img src="rose.png">
+                <p style="font-size:0.6rem">RED ROSE</p>
+            </div>
+            <div class="b-card" onclick="openWorkshop()"><img src="flowers1.png">
+                <p style="font-size:0.6rem">BLACK ROSE</p>
+            </div>
+            <div class="b-card" onclick="openWorkshop()"><img src="flora1.png">
+                <p style="font-size:0.6rem">MIXTURE</p>
+            </div>
         </div>
     </div>
 
@@ -95,7 +428,8 @@
                 <img src="black.png" class="part" id="f1" draggable="true">
                 <img src="sunny.png" class="part" id="f2" draggable="true">
                 <img src="roseee.png" class="part" id="f3" draggable="true">
-                <div style="width:50px; height:70px; background:#c4a484; flex-shrink:0" class="part" id="wrap_paper" draggable="true"></div>
+                <div style="width:50px; height:70px; background:#c4a484; flex-shrink:0" class="part" id="wrap_paper"
+                    draggable="true"></div>
                 <div style="font-size:40px;" class="part" id="bow" draggable="true">🎀</div>
                 <div style="font-size:40px;" class="part" id="heart" draggable="true">❤️</div>
             </div>
@@ -103,7 +437,7 @@
                 <div class="drop-zone" id="assembly-area"></div>
             </div>
         </div>
-        
+
         <div class="btn-group">
             <button class="tool" onclick="location.reload()">RESTART</button>
             <button class="tool" style="color: #ff2e2e;" onclick="triggerFinale()">GIVE ❤️</button>
@@ -124,9 +458,9 @@
         window.addEventListener('scroll', () => {
             const scroll = window.scrollY;
             const btn = document.getElementById('enter-btn');
-            if (scroll > 1000) { 
-                document.body.style.background = "#2a0000"; 
-                btn.style.display = "block"; 
+            if (scroll > 1000) {
+                document.body.style.background = "#2a0000";
+                btn.style.display = "block";
             } else {
                 document.body.style.background = "#fff";
             }
@@ -143,7 +477,7 @@
             p.addEventListener('dragstart', (e) => e.dataTransfer.setData('text', e.target.id));
             // Add click-to-add for mobile
             p.addEventListener('click', () => {
-                const fakeEvent = { clientX: window.innerWidth/2, clientY: window.innerHeight/2 };
+                const fakeEvent = { clientX: window.innerWidth / 2, clientY: window.innerHeight / 2 };
                 createClone(p.id, fakeEvent);
             });
         });
@@ -159,15 +493,15 @@
             const clone = original.cloneNode(true);
             clone.classList.add('placed');
             clone.style.position = 'absolute';
-            
+
             const rect = assembly.getBoundingClientRect();
             const x = e.clientX - rect.left;
             const y = e.clientY - rect.top;
 
             // Responsive Sizing
             const isMobile = window.innerWidth < 768;
-            if(id === 'wrap_paper') {
-                clone.style.zIndex = 1; 
+            if (id === 'wrap_paper') {
+                clone.style.zIndex = 1;
                 clone.style.width = isMobile ? "80vw" : "400px";
                 clone.style.height = isMobile ? "60vh" : "550px";
             } else {
@@ -180,12 +514,12 @@
 
             // Interaction
             clone.addEventListener('click', () => { clone.style.zIndex = zCounter++; });
-            
+
             // Allow dragging items already placed (simple version)
             let isDragging = false;
             clone.onmousedown = (ev) => { isDragging = true; };
             window.onmousemove = (ev) => {
-                if(isDragging) {
+                if (isDragging) {
                     clone.style.left = (ev.clientX - rect.left - 50) + 'px';
                     clone.style.top = (ev.clientY - rect.top - 50) + 'px';
                 }
@@ -218,4 +552,5 @@
         }
     </script>
 </body>
+
 </html>
