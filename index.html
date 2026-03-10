@@ -8,12 +8,12 @@
     <style>
         :root {
             --red: #4a0000;
-            --yellow: #c9d650;
-            --white: #ebde69;
+            --yellow: #f4d03f;
+            --white: #ffffff;
+            --gold: #ebde69;
         }
 
-        body,
-        html {
+        body, html {
             margin: 0;
             padding: 0;
             font-family: 'Cinzel', serif;
@@ -21,16 +21,10 @@
             overflow-x: hidden;
             background: var(--white);
             transition: background 1s ease;
+            touch-action: manipulation; /* Prevents double-tap zoom delay */
         }
 
-        /* Make images responsive */
-        img {
-            max-width: 100%;
-            height: auto;
-        }
-
-        /* --- STAGE 1 --- */
-
+        /* --- STAGE 1: SCROLL STORY --- */
         .section {
             height: 100vh;
             display: flex;
@@ -39,11 +33,6 @@
             justify-content: center;
             text-align: center;
             padding: 20px;
-            transition: 1s;
-        }
-
-        .section h1 {
-            font-size: clamp(2rem, 5vw, 4rem);
         }
 
         .scroll-hint {
@@ -51,7 +40,7 @@
             bottom: 20px;
             width: 100%;
             text-align: center;
-            font-size: .8rem;
+            font-size: 0.8rem;
             letter-spacing: 3px;
             color: #888;
             animation: bounce 2s infinite;
@@ -60,15 +49,15 @@
 
         #enter-btn {
             display: none;
-            margin-top: 30px;
-            padding: 12px 30px;
+            margin-top: 40px;
+            padding: 15px 40px;
             border: 1px solid white;
             background: none;
             color: white;
             cursor: pointer;
             letter-spacing: 5px;
-            font-size: clamp(14px, 2vw, 18px);
-            transition: .5s;
+            font-size: 1.2rem;
+            transition: 0.5s;
         }
 
         #enter-btn:hover {
@@ -76,145 +65,110 @@
             color: black;
         }
 
-        /* --- HUB --- */
-
+        /* --- STAGE 2: SELECTION HUB --- */
         #hub {
             display: none;
             position: fixed;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
+            inset: 0;
             background: radial-gradient(circle, #1a0000 0%, #000 100%);
-            z-index: 100;
+            z-index: 1000;
             flex-direction: column;
             align-items: center;
             justify-content: center;
             color: white;
-            padding: 20px;
         }
 
         .bouquet-grid {
             display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(120px, 1fr));
+            grid-template-columns: repeat(2, 1fr);
             gap: 20px;
+            margin-top: 30px;
             width: 90%;
-            max-width: 800px;
-            margin-top: 40px;
+            max-width: 600px;
         }
 
         .b-card {
             cursor: pointer;
-            transition: .4s;
             text-align: center;
+            padding: 10px;
         }
 
         .b-card img {
             width: 100%;
-            filter: drop-shadow(0 0 10px rgba(255, 255, 255, .1));
-            transition: .4s;
+            max-width: 150px;
+            filter: drop-shadow(0 0 10px rgba(255, 255, 255, 0.1));
+            transition: 0.4s;
         }
 
         .b-card:hover img {
-            transform: translateY(-15px) scale(1.08);
-            filter: drop-shadow(0 0 25px var(--red));
+            transform: translateY(-10px);
+            filter: drop-shadow(0 0 20px var(--red));
         }
 
-        /* --- WORKSHOP --- */
-
+        /* --- STAGE 3: THE WORKSHOP --- */
         #workshop {
             display: none;
             position: fixed;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
+            inset: 0;
             background: #0a0a0a;
-            z-index: 200;
+            z-index: 2000;
             overflow: hidden;
         }
 
         .workspace {
-            position: relative;
+            display: flex;
+            flex-direction: row;
             width: 100%;
             height: 100%;
-            display: flex;
         }
 
-        /* Shelf */
-
         .shelf {
-            width: 20vw;
-            min-width: 120px;
-            max-width: 200px;
+            width: 120px;
             background: #111;
-            padding: 15px;
+            padding: 10px;
             display: flex;
             flex-direction: column;
             gap: 15px;
             overflow-y: auto;
             border-right: 1px solid #333;
-            z-index: 201;
-        }
-
-        .shelf p {
-            color: #555;
-            font-size: .7rem;
-            letter-spacing: 2px;
-            border-bottom: 1px solid #222;
-            padding-bottom: 5px;
         }
 
         .part {
-            width: 20vw;
-            max-width: 100px;
+            width: 80px;
             cursor: grab;
-            filter: drop-shadow(0 5px 5px black);
-            transition: .2s;
+            margin: 0 auto;
+            touch-action: none; /* Required for smooth touch dragging */
         }
-
-        .part:active {
-            cursor: grabbing;
-        }
-
-        /* Table */
 
         .table {
             flex-grow: 1;
+            background: radial-gradient(circle, #2a1b15 0%, #0a0a0a 100%);
             position: relative;
-            background: url('https://www.transparenttextures.com/patterns/dark-wood.png'), #1a0f0a;
             display: flex;
             align-items: center;
             justify-content: center;
-            padding: 10px;
         }
 
-        /* Drop Zone */
-
         .drop-zone {
-            width: 90vw;
-            max-width: 600px;
-            height: 75vh;
-            max-height: 800px;
+            width: 90%;
+            height: 90%;
             position: relative;
-            border: 1px solid rgba(255, 255, 255, .05);
         }
 
         .placed {
             position: absolute;
             cursor: move;
-            transform-origin: center;
-            transition: outline .2s;
+            touch-action: none;
+            user-select: none;
         }
 
         /* --- FINALE --- */
-
         #finale-overlay {
             display: none;
             position: fixed;
             inset: 0;
-            background: rgba(0, 0, 0, .85);
-            z-index: 500;
+            background: rgba(0, 0, 0, 0.9);
+            z-index: 3000;
             align-items: center;
             justify-content: center;
             flex-direction: column;
@@ -225,200 +179,64 @@
             background: #fffdf5;
             color: #333;
             padding: 30px;
-            border-radius: 4px;
-            box-shadow: 0 0 40px rgba(255, 46, 46, .3);
-            max-width: 90%;
-            width: 400px;
-            font-family: 'Georgia', serif;
+            width: 80%;
+            max-width: 350px;
             text-align: center;
+            box-shadow: 0 0 30px var(--red);
         }
-
-        .envelope {
-            font-size: clamp(60px, 8vw, 80px);
-            cursor: pointer;
-            transition: .5s;
-            filter: drop-shadow(0 0 20px rgba(255, 255, 255, .2));
-        }
-
-        .bloom-petal {
-            position: fixed;
-            color: #ffcccc;
-            pointer-events: none;
-            z-index: 600;
-            font-size: 20px;
-        }
-
-        /* Buttons */
 
         .btn-group {
-            position: fixed;
-            bottom: 20px;
+            position: absolute;
+            top: 20px;
             right: 20px;
             display: flex;
+            flex-direction: column;
             gap: 10px;
-            z-index: 300;
         }
 
-        button.tool {
-            background: #111;
+        .tool {
+            background: rgba(0,0,0,0.5);
             border: 1px solid #444;
-            color: #888;
-            padding: 10px 18px;
-            cursor: pointer;
-            letter-spacing: 2px;
-            font-size: 14px;
-        }
-
-        button.tool:hover {
-            border-color: white;
             color: white;
+            padding: 10px;
+            cursor: pointer;
+            font-size: 0.8rem;
         }
 
-        /* --- MOBILE --- */
-
-        @media (max-width:768px) {
-
-            .workspace {
-                flex-direction: column;
-            }
-
-            .shelf {
-                width: 100%;
-                flex-direction: row;
-                overflow-x: auto;
-                overflow-y: hidden;
-                border-right: none;
-                border-bottom: 1px solid #333;
-            }
-
-            .shelf p {
-                display: none;
-            }
-
-            .part {
-                width: 70px;
-                max-width: none;
-            }
-
-            .table {
-                height: 80vh;
-            }
-
-            .drop-zone {
-                width: 95vw;
-                height: 70vh;
-            }
-
-            .b-card {
-                width: 120px;
-                margin: auto;
-            }
-
-            .btn-group {
-                right: 10px;
-                bottom: 10px;
-            }
-
-        }
-
-        /* animation */
-
-        @keyframes bounce {
-
-            0%,
-            100% {
-                transform: translateY(0)
-            }
-
-            50% {
-                transform: translateY(-10px)
-            }
-        }
-
-        /* :root { --red: #4a0000; --yellow: #f4d03f; --white: #ffffff; }
-        body, html { margin: 0; padding: 0; font-family: 'Cinzel', serif; background: var(--white); overflow-x: hidden; width: 100%; height: 100%; }
-
-        /* --- STAGE 1: SCROLL STORY --- */
-        /* .section { height: 100vh; display: flex; flex-direction: column; align-items: center; justify-content: center; text-align: center; padding: 20px; transition: 1s; }
-        .scroll-hint { position: fixed; bottom: 20px; width: 100%; text-align: center; font-size: 0.7rem; letter-spacing: 3px; color: #888; animation: bounce 2s infinite; z-index: 50; }
-        
-        #enter-btn { display: none; margin-top: 30px; padding: 12px 30px; border: 1px solid white; background: none; color: white; cursor: pointer; letter-spacing: 3px; font-size: 1rem; transition: 0.5s; } */
-
-        /* --- STAGE 2: SELECTION HUB --- */
-        /* #hub { display: none; position: fixed; inset: 0; background: radial-gradient(circle, #1a0000 0%, #000 100%); z-index: 100; flex-direction: column; align-items: center; justify-content: center; color: white; padding: 20px; }
-        .bouquet-grid { 
-            display: grid; 
-            grid-template-columns: repeat(2, 1fr); 
-            gap: 20px; 
-            width: 100%; 
-            max-width: 600px; 
-            margin-top: 30px; 
-        }
-        .b-card { cursor: pointer; transition: 0.4s; text-align: center; }
-        .b-card img { width: 80%; max-width: 150px; filter: drop-shadow(0 0 10px rgba(255,255,255,0.1)); } */
-
-        /* --- STAGE 3: RESPONSIVE WORKSHOP --- */
-        /* #workshop { display: none; position: fixed; inset: 0; background: #0a0a0a; z-index: 200; }
-        .workspace { display: flex; flex-direction: row; width: 100%; height: 100%; } */
-
-        /* Mobile Sidebar becomes a Bottom Dock */
-
-        /* --- MOBILE ADAPTATION (Phones/Tabs) --- */
-        /* @media (max-width: 768px) {
+        @media (max-width: 768px) {
             .workspace { flex-direction: column-reverse; }
             .shelf { 
                 width: 100%; height: 100px; 
-                flex-direction: row; overflow-x: auto; overflow-y: hidden;
-                border-right: none; border-top: 1px solid #333; padding: 10px;
+                flex-direction: row; border-right: none; border-top: 1px solid #333;
             }
-            .part { width: 60px; height: 60px; }
-            .section h1 { font-size: 1.5rem; }
-            #letter-box { width: 85%; padding: 20px; }
-        } */
+            .part { width: 60px; }
+            .btn-group { top: 10px; right: 10px; }
+        }
 
-        /* --- FINALE --- */
-        /* #finale-overlay { display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.9); z-index: 500; align-items: center; justify-content: center; }
-        #letter-box { display: none; background: #fffdf5; color: #333; padding: 30px; border-radius: 5px; max-width: 90%; font-family: serif; text-align: center; }
-        .envelope { font-size: 60px; cursor: pointer; }
-        .bloom-petal { position: fixed; pointer-events: none; z-index: 600; }
-
-        .btn-group { position: fixed; top: 10px; right: 10px; display: flex; gap: 8px; z-index: 300; }
-        button.tool { background: rgba(0,0,0,0.6); border: 1px solid #444; color: #fff; padding: 8px 12px; font-size: 0.7rem; cursor: pointer; }
-
-        @keyframes bounce { 0%, 100% { transform: translateY(0); } 50% { transform: translateY(-10px); } }
-    </style> */
+        @keyframes bounce {
+            0%, 100% { transform: translateY(0); }
+            50% { transform: translateY(-10px); }
+        }
+    </style>
 </head>
 
 <body>
+    <div class="scroll-hint" id="hint">SCROLL TO BEGIN</div>
 
-    <div class="scroll-hint" id="hint">SCROLL</div>
-
-    <div class="section" id="sec1">
-        <h1>ONLY</h1>
-    </div>
-    <div class="section" id="sec2">
-        <h1>FOR</h1>
-    </div>
+    <div class="section" id="sec1"><h1>ONLY</h1></div>
+    <div class="section" id="sec2"><h1>FOR</h1></div>
     <div class="section" id="sec3">
-        <h1 style="color: var(--red);">YOU🤍</h1>
-        <button id="enter-btn" onclick="openHub()">START</button>
+        <h1 style="color: white; margin-bottom: 20px;">YOU🤍</h1>
+        <button id="enter-btn" onclick="openHub()">Enter In The Game</button>
     </div>
 
     <div id="hub">
-        <h2 style="font-size: 1rem; letter-spacing: 3px;">CHOOSE A SOUL</h2>
+        <h2 style="letter-spacing: 3px;">SELECT A BOUQUET</h2>
         <div class="bouquet-grid">
-            <div class="b-card" onclick="openWorkshop()"><img src="sun.png">
-                <p style="font-size:0.6rem">SUNFLOWER</p>
-            </div>
-            <div class="b-card" onclick="openWorkshop()"><img src="rose.png">
-                <p style="font-size:0.6rem">RED ROSE</p>
-            </div>
-            <div class="b-card" onclick="openWorkshop()"><img src="flowers1.png">
-                <p style="font-size:0.6rem">BLACK ROSE</p>
-            </div>
-            <div class="b-card" onclick="openWorkshop()"><img src="flora1.png">
-                <p style="font-size:0.6rem">MIXTURE</p>
-            </div>
+            <div class="b-card" onclick="openWorkshop()"><img src="sun.png"><p>SUNFLOWER</p></div>
+            <div class="b-card" onclick="openWorkshop()"><img src="rose.png"><p>RED ROSE</p></div>
+            <div class="b-card" onclick="openWorkshop()"><img src="flowers1.png"><p>BLACK ROSE</p></div>
+            <div class="b-card" onclick="openWorkshop()"><img src="flora1.png"><p>MIXTURE</p></div>
         </div>
     </div>
 
@@ -428,16 +246,14 @@
                 <img src="black.png" class="part" id="f1" draggable="true">
                 <img src="sunny.png" class="part" id="f2" draggable="true">
                 <img src="roseee.png" class="part" id="f3" draggable="true">
-                <div style="width:50px; height:70px; background:#c4a484; flex-shrink:0" class="part" id="wrap_paper"
-                    draggable="true"></div>
-                <div style="font-size:40px;" class="part" id="bow" draggable="true">🎀</div>
-                <div style="font-size:40px;" class="part" id="heart" draggable="true">❤️</div>
+                <div id="wrap_paper" class="part" style="width: 50px; height: 70px; background: #c4a484;"></div>
+                <div id="bow" class="part" style="font-size: 40px;">🎀</div>
+                <div id="heart" class="part" style="font-size: 40px;">❤️</div>
             </div>
             <div class="table">
                 <div class="drop-zone" id="assembly-area"></div>
             </div>
         </div>
-
         <div class="btn-group">
             <button class="tool" onclick="location.reload()">RESTART</button>
             <button class="tool" style="color: #ff2e2e;" onclick="triggerFinale()">GIVE ❤️</button>
@@ -445,10 +261,10 @@
     </div>
 
     <div id="finale-overlay">
-        <div class="envelope" id="env" onclick="revealLetter()">📩</div>
+        <div class="envelope" id="env" onclick="revealLetter()" style="font-size: 80px; cursor:pointer;">📩</div>
         <div id="letter-box">
             <p>You made this beautiful, just like you make everything else better. Thank you for being in my world.</p>
-            <button class="tool" onclick="location.reload()" style="background:var(--red); color:white;">Close</button>
+            <button class="tool" onclick="location.reload()" style="background:var(--red); color:white; width:100%">Close</button>
         </div>
     </div>
 
@@ -458,91 +274,112 @@
         window.addEventListener('scroll', () => {
             const scroll = window.scrollY;
             const btn = document.getElementById('enter-btn');
-            if (scroll > 1000) {
+            const hint = document.getElementById('hint');
+            if (scroll > 500) {
                 document.body.style.background = "#2a0000";
                 btn.style.display = "block";
+                hint.style.display = "none";
             } else {
-                document.body.style.background = "#fff";
+                document.body.style.background = "#ebde69";
+                btn.style.display = "none";
+                hint.style.display = "block";
             }
         });
 
         function openHub() { document.getElementById('hub').style.display = 'flex'; }
-        function openWorkshop() { document.getElementById('workshop').style.display = 'block'; }
+        function openWorkshop() { 
+            document.getElementById('hub').style.display = 'none';
+            document.getElementById('workshop').style.display = 'block'; 
+        }
 
-        // Mobile-friendly drag and drop logic
+        // Logic to create clones
         const parts = document.querySelectorAll('.part');
         const assembly = document.getElementById('assembly-area');
 
         parts.forEach(p => {
-            p.addEventListener('dragstart', (e) => e.dataTransfer.setData('text', e.target.id));
-            // Add click-to-add for mobile
             p.addEventListener('click', () => {
-                const fakeEvent = { clientX: window.innerWidth / 2, clientY: window.innerHeight / 2 };
-                createClone(p.id, fakeEvent);
+                createClone(p.id);
             });
         });
 
-        assembly.addEventListener('dragover', (e) => e.preventDefault());
-        assembly.addEventListener('drop', (e) => {
-            e.preventDefault();
-            createClone(e.dataTransfer.getData('text'), e);
-        });
-
-        function createClone(id, e) {
+        function createClone(id) {
             const original = document.getElementById(id);
             const clone = original.cloneNode(true);
             clone.classList.add('placed');
-            clone.style.position = 'absolute';
-
-            const rect = assembly.getBoundingClientRect();
-            const x = e.clientX - rect.left;
-            const y = e.clientY - rect.top;
-
-            // Responsive Sizing
-            const isMobile = window.innerWidth < 768;
-            if (id === 'wrap_paper') {
+            clone.style.left = '50px';
+            clone.style.top = '50px';
+            
+            if(id === 'wrap_paper') {
+                clone.style.width = "200px";
+                clone.style.height = "280px";
                 clone.style.zIndex = 1;
-                clone.style.width = isMobile ? "80vw" : "400px";
-                clone.style.height = isMobile ? "60vh" : "550px";
             } else {
+                clone.style.width = "120px";
                 clone.style.zIndex = zCounter++;
-                clone.style.width = isMobile ? "100px" : "180px";
             }
 
-            clone.style.left = (x - 50) + 'px';
-            clone.style.top = (y - 50) + 'px';
+            // --- SMOOTH DRAGGING LOGIC ---
+            let active = false;
+            let currentX, currentY, initialX, initialY;
+            let xOffset = 0, yOffset = 0;
 
-            // Interaction
-            clone.addEventListener('click', () => { clone.style.zIndex = zCounter++; });
+            const dragStart = (e) => {
+                clone.style.zIndex = zCounter++;
+                if (e.type === "touchstart") {
+                    initialX = e.touches[0].clientX - xOffset;
+                    initialY = e.touches[0].clientY - yOffset;
+                } else {
+                    initialX = e.clientX - xOffset;
+                    initialY = e.clientY - yOffset;
+                }
+                active = true;
+            };
 
-            // Allow dragging items already placed (simple version)
-            let isDragging = false;
-            clone.onmousedown = (ev) => { isDragging = true; };
-            window.onmousemove = (ev) => {
-                if (isDragging) {
-                    clone.style.left = (ev.clientX - rect.left - 50) + 'px';
-                    clone.style.top = (ev.clientY - rect.top - 50) + 'px';
+            const dragMove = (e) => {
+                if (active) {
+                    e.preventDefault();
+                    let clientX = e.type === "touchmove" ? e.touches[0].clientX : e.clientX;
+                    let clientY = e.type === "touchmove" ? e.touches[0].clientY : e.clientY;
+                    currentX = clientX - initialX;
+                    currentY = clientY - initialY;
+                    xOffset = currentX;
+                    yOffset = currentY;
+                    
+                    // Uses hardware acceleration for smoothness
+                    clone.style.transform = `translate3d(${currentX}px, ${currentY}px, 0)`;
                 }
             };
-            window.onmouseup = () => { isDragging = false; };
+
+            const dragEnd = () => { active = false; };
+
+            clone.addEventListener("touchstart", dragStart, {passive: false});
+            clone.addEventListener("mousedown", dragStart);
+            window.addEventListener("touchmove", dragMove, {passive: false});
+            window.addEventListener("mousemove", dragMove);
+            window.addEventListener("touchend", dragEnd);
+            window.addEventListener("mouseup", dragEnd);
 
             assembly.appendChild(clone);
         }
 
         function triggerFinale() {
             document.getElementById('finale-overlay').style.display = 'flex';
-            setInterval(createPetal, 300);
+            setInterval(createPetal, 400);
         }
 
         function createPetal() {
             const p = document.createElement('div');
             p.innerHTML = '🌸';
-            p.className = 'bloom-petal';
+            p.style.position = 'fixed';
             p.style.left = Math.random() * 100 + 'vw';
             p.style.top = '-20px';
-            p.style.transition = `top 3s linear`;
+            p.style.zIndex = 4000;
+            p.style.transition = 'top 4s linear, transform 4s linear';
             document.body.appendChild(p);
-            setTimeout(() => { p.style.top = '110vh'; }, 10);
+            setTimeout(() => { 
+                p.style.top = '110vh'; 
+                p.style.transform = `rotate(${Math.random() * 360}deg)`;
+            }, 50);
             setTimeout(() => p.remove(), 4000);
         }
 
@@ -552,5 +389,4 @@
         }
     </script>
 </body>
-
 </html>
