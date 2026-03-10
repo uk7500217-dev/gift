@@ -1,6 +1,5 @@
 <!DOCTYPE html>
 <html lang="en">
-
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
@@ -8,9 +7,10 @@
     <style>
         :root {
             --red: #4a0000;
-            --yellow: #f4d03f;
             --white: #ffffff;
             --gold: #ebde69;
+            --glass: rgba(255, 255, 255, 0.1);
+            --glass-border: rgba(255, 255, 255, 0.2);
         }
 
         body, html {
@@ -19,12 +19,21 @@
             font-family: 'Cinzel', serif;
             scroll-behavior: smooth;
             overflow-x: hidden;
-            background: var(--white);
-            transition: background 1s ease;
-            touch-action: manipulation; /* Prevents double-tap zoom delay */
+            background: var(--gold);
+            transition: background 1.5s cubic-bezier(0.4, 0, 0.2, 1);
         }
 
-        /* --- STAGE 1: SCROLL STORY --- */
+        /* --- ANIMATIONS --- */
+        @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
+        @keyframes float { 0%, 100% { transform: translateY(0); } 50% { transform: translateY(-8px); } }
+        @keyframes sway { 
+            0% { transform: translateX(0) rotate(0deg); }
+            50% { transform: translateX(20px) rotate(20deg); }
+            100% { transform: translateX(0) rotate(0deg); }
+        }
+        @keyframes zoomIn { from { transform: scale(0.95); opacity: 0; } to { transform: scale(1); opacity: 1; } }
+
+        /* --- STAGE 1 --- */
         .section {
             height: 100vh;
             display: flex;
@@ -33,133 +42,103 @@
             justify-content: center;
             text-align: center;
             padding: 20px;
-        }
-
-        .scroll-hint {
-            position: fixed;
-            bottom: 20px;
-            width: 100%;
-            text-align: center;
-            font-size: 0.8rem;
-            letter-spacing: 3px;
-            color: #888;
-            animation: bounce 2s infinite;
-            z-index: 50;
+            animation: fadeIn 1.2s ease-out;
         }
 
         #enter-btn {
             display: none;
             margin-top: 40px;
-            padding: 15px 40px;
+            padding: 15px 45px;
             border: 1px solid white;
-            background: none;
+            background: rgba(255,255,255,0.1);
+            backdrop-filter: blur(5px);
             color: white;
             cursor: pointer;
             letter-spacing: 5px;
-            font-size: 1.2rem;
-            transition: 0.5s;
+            font-size: 1rem;
+            transition: 0.4s;
+            animation: fadeIn 1s;
         }
 
-        #enter-btn:hover {
-            background: white;
-            color: black;
-        }
-
-        /* --- STAGE 2: SELECTION HUB --- */
+        /* --- HUB (Selection) --- */
         #hub {
             display: none;
             position: fixed;
             inset: 0;
-            background: radial-gradient(circle, #1a0000 0%, #000 100%);
+            background: radial-gradient(circle at center, #2a0000 0%, #050505 100%);
             z-index: 1000;
             flex-direction: column;
             align-items: center;
             justify-content: center;
             color: white;
+            padding: 20px;
+            animation: zoomIn 0.8s ease-out;
         }
 
         .bouquet-grid {
             display: grid;
             grid-template-columns: repeat(2, 1fr);
-            gap: 20px;
+            gap: 15px;
             margin-top: 30px;
-            width: 90%;
+            width: 100%;
             max-width: 600px;
         }
 
         .b-card {
             cursor: pointer;
             text-align: center;
-            padding: 10px;
+            background: var(--glass);
+            backdrop-filter: blur(10px);
+            border: 1px solid var(--glass-border);
+            padding: 20px;
+            border-radius: 15px;
+            transition: transform 0.3s, background 0.3s;
         }
+
+        .b-card:active { transform: scale(0.95); }
 
         .b-card img {
             width: 100%;
-            max-width: 150px;
-            filter: drop-shadow(0 0 10px rgba(255, 255, 255, 0.1));
-            transition: 0.4s;
+            max-width: 110px;
+            height: auto;
+            filter: drop-shadow(0 10px 15px rgba(0,0,0,0.5));
+            animation: float 4s ease-in-out infinite;
         }
 
-        .b-card:hover img {
-            transform: translateY(-10px);
-            filter: drop-shadow(0 0 20px var(--red));
-        }
-
-        /* --- STAGE 3: THE WORKSHOP --- */
+        /* --- WORKSHOP --- */
         #workshop {
             display: none;
             position: fixed;
             inset: 0;
-            background: #0a0a0a;
+            background: #080808;
             z-index: 2000;
-            overflow: hidden;
+            animation: fadeIn 0.5s;
         }
 
-        .workspace {
-            display: flex;
-            flex-direction: row;
-            width: 100%;
-            height: 100%;
-        }
+        .workspace { display: flex; width: 100%; height: 100%; }
 
         .shelf {
-            width: 120px;
-            background: #111;
-            padding: 10px;
+            width: 140px;
+            background: rgba(15,15,15,0.9);
+            padding: 20px 10px;
             display: flex;
             flex-direction: column;
-            gap: 15px;
+            gap: 25px;
+            border-right: 1px solid #222;
             overflow-y: auto;
-            border-right: 1px solid #333;
         }
 
         .part {
-            width: 80px;
+            width: 70px;
             cursor: grab;
             margin: 0 auto;
-            touch-action: none; /* Required for smooth touch dragging */
+            transition: transform 0.2s;
         }
 
         .table {
             flex-grow: 1;
-            background: radial-gradient(circle, #2a1b15 0%, #0a0a0a 100%);
+            background: radial-gradient(circle, #1a120f 0%, #000 100%);
             position: relative;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-        }
-
-        .drop-zone {
-            width: 90%;
-            height: 90%;
-            position: relative;
-        }
-
-        .placed {
-            position: absolute;
-            cursor: move;
-            touch-action: none;
-            user-select: none;
         }
 
         /* --- FINALE --- */
@@ -167,22 +146,20 @@
             display: none;
             position: fixed;
             inset: 0;
-            background: rgba(0, 0, 0, 0.9);
+            background: rgba(0, 0, 0, 0.95);
             z-index: 3000;
             align-items: center;
             justify-content: center;
             flex-direction: column;
+            backdrop-filter: blur(10px);
         }
 
-        #letter-box {
-            display: none;
-            background: #fffdf5;
-            color: #333;
-            padding: 30px;
-            width: 80%;
-            max-width: 350px;
-            text-align: center;
-            box-shadow: 0 0 30px var(--red);
+        .petal {
+            position: fixed;
+            pointer-events: none;
+            z-index: 4000;
+            font-size: 20px;
+            animation: sway 3s ease-in-out infinite;
         }
 
         .btn-group {
@@ -190,124 +167,112 @@
             top: 20px;
             right: 20px;
             display: flex;
-            flex-direction: column;
             gap: 10px;
         }
 
         .tool {
-            background: rgba(0,0,0,0.5);
-            border: 1px solid #444;
+            background: var(--glass);
+            backdrop-filter: blur(5px);
+            border: 1px solid var(--glass-border);
             color: white;
-            padding: 10px;
+            padding: 10px 20px;
+            border-radius: 20px;
+            font-size: 0.7rem;
+            letter-spacing: 1px;
             cursor: pointer;
-            font-size: 0.8rem;
         }
 
-        @media (max-width: 768px) {
+        /* Tablet Responsive */
+        @media (max-width: 900px) {
             .workspace { flex-direction: column-reverse; }
-            .shelf { 
-                width: 100%; height: 100px; 
-                flex-direction: row; border-right: none; border-top: 1px solid #333;
-            }
+            .shelf { width: 100%; height: 100px; flex-direction: row; border-right: none; border-top: 1px solid #222; }
             .part { width: 60px; }
-            .btn-group { top: 10px; right: 10px; }
-        }
-
-        @keyframes bounce {
-            0%, 100% { transform: translateY(0); }
-            50% { transform: translateY(-10px); }
         }
     </style>
 </head>
-
 <body>
-    <div class="scroll-hint" id="hint">SCROLL TO BEGIN</div>
 
-    <div class="section" id="sec1"><h1>ONLY</h1></div>
-    <div class="section" id="sec2"><h1>FOR</h1></div>
-    <div class="section" id="sec3">
-        <h1 style="color: white; margin-bottom: 20px;">YOU🤍</h1>
-        <button id="enter-btn" onclick="openHub()">Enter In The Game</button>
+    <div class="section" id="intro">
+        <h1 style="font-size: 2.5rem; letter-spacing: 8px;">THE</h1>
+        <h1 style="font-size: 3.5rem; letter-spacing: 12px; color: white;">FLORAL</h1>
+        <h1 style="font-size: 2.5rem; letter-spacing: 8px;">ATELIER</h1>
+        <p style="margin-top: 20px; color: #555; letter-spacing: 2px;">Scroll to unveil</p>
+    </div>
+
+    <div class="section" id="trigger-sec">
+        <h1 id="main-text" style="color: white; transition: 1s;">ONLY FOR YOU 🤍</h1>
+        <button id="enter-btn" onclick="openHub()">BEGIN THE JOURNEY</button>
     </div>
 
     <div id="hub">
-        <h2 style="letter-spacing: 3px;">SELECT A BOUQUET</h2>
+        <h2 style="letter-spacing: 4px; font-weight: 300;">WHICH SOUL SPEAKS TO YOU?</h2>
         <div class="bouquet-grid">
-            <div class="b-card" onclick="openWorkshop()"><img src="sun.png"><p>SUNFLOWER</p></div>
-            <div class="b-card" onclick="openWorkshop()"><img src="rose.png"><p>RED ROSE</p></div>
-            <div class="b-card" onclick="openWorkshop()"><img src="flowers1.png"><p>BLACK ROSE</p></div>
-            <div class="b-card" onclick="openWorkshop()"><img src="flora1.png"><p>MIXTURE</p></div>
+            <div class="b-card" onclick="openWorkshop('black')"><img src="black.png"><p>BLACK ROSE</p></div>
+            <div class="b-card" onclick="openWorkshop('sun')"><img src="sun.png"><p>SUNFLOWER</p></div>
+            <div class="b-card" onclick="openWorkshop('rose')"><img src="rose.png"><p>RED ROSE</p></div>
+            <div class="b-card" onclick="openWorkshop('mixture')"><img src="flora1.png"><p>MIXTURE</p></div>
         </div>
     </div>
 
     <div id="workshop">
         <div class="workspace">
             <div class="shelf">
-                <img src="black.png" class="part" id="f1" draggable="true">
-                <img src="sunny.png" class="part" id="f2" draggable="true">
-                <img src="roseee.png" class="part" id="f3" draggable="true">
-                <div id="wrap_paper" class="part" style="width: 50px; height: 70px; background: #c4a484;"></div>
-                <div id="bow" class="part" style="font-size: 40px;">🎀</div>
-                <div id="heart" class="part" style="font-size: 40px;">❤️</div>
+                <img src="black.png" class="part" id="f1" onclick="createClone('f1')">
+                <img src="sunny.png" class="part" id="f2" onclick="createClone('f2')">
+                <img src="roseee.png" class="part" id="f3" onclick="createClone('f3')">
+                <div id="wrap_paper" class="part" style="width: 50px; height: 70px; background: #c4a484; border-radius: 2px;" onclick="createClone('wrap_paper')"></div>
+                <div id="bow" class="part" style="font-size: 40px; text-align:center;" onclick="createClone('bow')">🎀</div>
             </div>
             <div class="table">
-                <div class="drop-zone" id="assembly-area"></div>
+                <div id="assembly-area" style="width:100%; height:100%;"></div>
             </div>
         </div>
         <div class="btn-group">
             <button class="tool" onclick="location.reload()">RESTART</button>
-            <button class="tool" style="color: #ff2e2e;" onclick="triggerFinale()">GIVE ❤️</button>
+            <button class="tool" style="color: #ff4d4d;" onclick="triggerFinale()">GIVE ❤️</button>
         </div>
     </div>
 
     <div id="finale-overlay">
-        <div class="envelope" id="env" onclick="revealLetter()" style="font-size: 80px; cursor:pointer;">📩</div>
-        <div id="letter-box">
-            <p>You made this beautiful, just like you make everything else better. Thank you for being in my world.</p>
-            <button class="tool" onclick="location.reload()" style="background:var(--red); color:white; width:100%">Close</button>
+        <div id="env" onclick="revealLetter()" style="font-size: 80px; cursor:pointer; animation: float 3s infinite;">📩</div>
+        <div id="letter-box" style="display:none; color: white; text-align: center; padding: 20px; max-width: 80%;">
+            <p style="font-size: 1.2rem; line-height: 1.6;">"Like these flowers, your presence makes every moment bloom."</p>
+            <button class="tool" onclick="location.reload()" style="margin-top:30px;">Close with Love</button>
         </div>
     </div>
 
     <script>
         let zCounter = 10;
 
+        // Smooth Scroll Color Change
         window.addEventListener('scroll', () => {
             const scroll = window.scrollY;
             const btn = document.getElementById('enter-btn');
-            const hint = document.getElementById('hint');
-            if (scroll > 500) {
-                document.body.style.background = "#2a0000";
+            if (scroll > 300) {
+                document.body.style.background = "#1a0000";
                 btn.style.display = "block";
-                hint.style.display = "none";
             } else {
                 document.body.style.background = "#ebde69";
                 btn.style.display = "none";
-                hint.style.display = "block";
             }
         });
 
-        function openHub() { document.getElementById('hub').style.display = 'flex'; }
+        function openHub() { 
+            document.getElementById('hub').style.display = 'flex'; 
+        }
+
         function openWorkshop() { 
             document.getElementById('hub').style.display = 'none';
             document.getElementById('workshop').style.display = 'block'; 
         }
 
-        // Logic to create clones
-        const parts = document.querySelectorAll('.part');
-        const assembly = document.getElementById('assembly-area');
-
-        parts.forEach(p => {
-            p.addEventListener('click', () => {
-                createClone(p.id);
-            });
-        });
-
         function createClone(id) {
             const original = document.getElementById(id);
             const clone = original.cloneNode(true);
-            clone.classList.add('placed');
-            clone.style.left = '50px';
-            clone.style.top = '50px';
+            clone.style.position = 'absolute';
+            clone.style.left = '30%';
+            clone.style.top = '30%';
+            clone.style.transition = "transform 0.1s";
             
             if(id === 'wrap_paper') {
                 clone.style.width = "200px";
@@ -318,20 +283,17 @@
                 clone.style.zIndex = zCounter++;
             }
 
-            // --- SMOOTH DRAGGING LOGIC ---
+            // Enhanced Drag Logic
             let active = false;
             let currentX, currentY, initialX, initialY;
             let xOffset = 0, yOffset = 0;
 
             const dragStart = (e) => {
                 clone.style.zIndex = zCounter++;
-                if (e.type === "touchstart") {
-                    initialX = e.touches[0].clientX - xOffset;
-                    initialY = e.touches[0].clientY - yOffset;
-                } else {
-                    initialX = e.clientX - xOffset;
-                    initialY = e.clientY - yOffset;
-                }
+                let clientX = e.type === "touchstart" ? e.touches[0].clientX : e.clientX;
+                let clientY = e.type === "touchstart" ? e.touches[0].clientY : e.clientY;
+                initialX = clientX - xOffset;
+                initialY = clientY - yOffset;
                 active = true;
             };
 
@@ -344,8 +306,6 @@
                     currentY = clientY - initialY;
                     xOffset = currentX;
                     yOffset = currentY;
-                    
-                    // Uses hardware acceleration for smoothness
                     clone.style.transform = `translate3d(${currentX}px, ${currentY}px, 0)`;
                 }
             };
@@ -359,33 +319,31 @@
             window.addEventListener("touchend", dragEnd);
             window.addEventListener("mouseup", dragEnd);
 
-            assembly.appendChild(clone);
+            document.getElementById('assembly-area').appendChild(clone);
         }
 
         function triggerFinale() {
             document.getElementById('finale-overlay').style.display = 'flex';
-            setInterval(createPetal, 400);
+            setInterval(createPetal, 300);
         }
 
         function createPetal() {
             const p = document.createElement('div');
-            p.innerHTML = '🌸';
-            p.style.position = 'fixed';
+            p.className = 'petal';
+            p.innerHTML = Math.random() > 0.5 ? '🌸' : '🥀';
             p.style.left = Math.random() * 100 + 'vw';
-            p.style.top = '-20px';
-            p.style.zIndex = 4000;
-            p.style.transition = 'top 4s linear, transform 4s linear';
+            p.style.top = '-50px';
+            p.style.transition = `top ${Math.random() * 2 + 3}s linear`;
             document.body.appendChild(p);
-            setTimeout(() => { 
-                p.style.top = '110vh'; 
-                p.style.transform = `rotate(${Math.random() * 360}deg)`;
-            }, 50);
-            setTimeout(() => p.remove(), 4000);
+            
+            setTimeout(() => { p.style.top = '110vh'; }, 50);
+            setTimeout(() => p.remove(), 5000);
         }
 
         function revealLetter() {
             document.getElementById('env').style.display = 'none';
             document.getElementById('letter-box').style.display = 'block';
+            document.getElementById('letter-box').style.animation = "fadeIn 1.5s";
         }
     </script>
 </body>
